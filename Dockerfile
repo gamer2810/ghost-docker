@@ -51,7 +51,6 @@ RUN set -eux; \
 	mkdir -p "$GHOST_CONTENT"; \
 	chown node:node "$GHOST_CONTENT"; \
 	chmod 1777 "$GHOST_CONTENT"; \
-	\
 # force install a few extra packages manually since they're "optional" dependencies
 # (which means that if it fails to install, like on ARM/ppc64le/s390x, the failure will be silently ignored and thus turn into a runtime error instead)
 # see https://github.com/TryGhost/Ghost/pull/7677 for more details
@@ -96,10 +95,10 @@ RUN set -eux; \
 WORKDIR $GHOST_INSTALL
 VOLUME $GHOST_CONTENT
 
-# RUN set -eux; \
-# 	npm install ghost-imgur \
-# 	mkdir ${GHOST_CONTENT}/storage \
-# 	cp -vR node_modules/ghost-imgur ${GHOST_CONTENT}/storage/ghost-imgur
+RUN set -eux; \
+	npm install ghost-imgur; \
+	mkdir ${GHOST_CONTENT}/storage; \
+	cp -vR node_modules/ghost-imgur ${GHOST_CONTENT}/storage/ghost-imgur
 
 COPY docker-entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
