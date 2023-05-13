@@ -40,7 +40,7 @@ RUN set -eux; \
 	cd "$GHOST_INSTALL"; \
 	su-exec node ghost config --no-prompt --ip '::' --port 2368 --url 'http://localhost:2368'; \
 	su-exec node ghost config paths.contentPath "$GHOST_CONTENT"; \
-	su-exec node ghost config storage.active "ghost-imgur"; \
+	su-exec node ghost config storage.active "ghost-google-drive"; \
 	\
 # make a config.json symlink for NODE_ENV=development (and sanity check that it's correct)
 	su-exec node ln -s config.production.json "$GHOST_INSTALL/config.development.json"; \
@@ -95,10 +95,14 @@ RUN set -eux; \
 WORKDIR $GHOST_INSTALL
 VOLUME $GHOST_CONTENT
 
+# install additional dependencies
+
 RUN set -eux; \
-	npm install ghost-imgur; \
+	npm install ghost-google-drive; \
 	mkdir ${GHOST_CONTENT}/storage; \
-	cp -vR node_modules/ghost-imgur ${GHOST_CONTENT}/storage/ghost-imgur
+	cp -vR node_modules/ghost-google-drive ${GHOST_CONTENT}/storage/ghost-google-drive; \
+	cd ${GHOST_CONTENT}/storage/ghost-google-drive; \
+	npm install
 
 COPY docker-entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
