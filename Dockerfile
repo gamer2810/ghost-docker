@@ -29,12 +29,12 @@ RUN set -eux; \
 	apkDel=; \
 	\
 	installCmd='su-exec node ghost install "$GHOST_VERSION" --db mysql --storage ghost-imgur --dbhost mysql --no-prompt --no-stack --no-setup --dir "$GHOST_INSTALL"'; \
-	if ! eval "$installCmd"; then \
-		virtual='.build-deps-ghost'; \
-		apkDel="$apkDel $virtual"; \
-		apk add --no-cache --virtual "$virtual" g++ make python3; \
-		eval "$installCmd"; \
-	fi; \
+	# if ! eval "$installCmd"; then \
+	virtual='.build-deps-ghost'; \
+	apkDel="$apkDel $virtual"; \
+	apk add --no-cache --virtual "$virtual" g++ make python3; \
+	eval "$installCmd"; \
+	# fi; \
 	\
 # Tell Ghost to listen on all ips and not prompt for additional configuration
 	cd "$GHOST_INSTALL"; \
@@ -62,25 +62,22 @@ RUN set -eux; \
 		[ \
 			"sharp@" + transform.optionalDependencies["sharp"], \
 			"sqlite3@" + ghost.optionalDependencies["sqlite3"], \
-			"ghost-imgur@latest" \
 		].join(" ") \
 	')"; \
 	if echo "$packages" | grep 'undefined'; then exit 1; fi; \
 	for package in $packages; do \
 		installCmd='su-exec node yarn add "$package" --force'; \
-		if ! eval "$installCmd"; then \
-# must be some non-amd64 architecture pre-built binaries aren't published for, so let's install some build deps and do-it-all-over-again
-			virtualPackages='g++ make python3'; \
-			case "$package" in \
-				# TODO sharp@*) virtualPackages="$virtualPackages pkgconf vips-dev"; \
-				sharp@*) echo >&2 "sorry: libvips 8.12.1 in Alpine 3.15 is not new enough (8.12.2+) for sharp 0.30 😞"; continue ;; \
-			esac; \
-			virtual=".build-deps-${package%%@*}"; \
-			apkDel="$apkDel $virtual"; \
-			apk add --no-cache --virtual "$virtual" $virtualPackages; \
-			\
-			eval "$installCmd --build-from-source"; \
-		fi; \
+		\
+		virtualPackages='g++ make python3'; \
+		case "$package" in \
+			# TODO sharp@*) virtualPackages="$virtualPackages pkgconf vips-dev"; \
+			sharp@*) echo >&2 "sorry: libvips 8.12.1 in Alpine 3.15 is not new enough (8.12.2+) for sharp 0.30 😞"; continue ;; \
+		esac; \
+		virtual=".build-deps-${package%%@*}"; \
+		apkDel="$apkDel $virtual"; \
+		apk add --no-cache --virtual "$virtual" $virtualPackages; \
+		\
+		eval "$installCmd --build-from-source"; \
 	done; \
 	\
 	if [ -n "$apkDel" ]; then \
