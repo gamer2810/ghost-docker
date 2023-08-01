@@ -28,7 +28,7 @@ RUN set -eux; \
 	\
 	apkDel=; \
 	\
-	installCmd='su-exec node ghost install "$GHOST_VERSION" --db mysql --storage ghost-imgur --dbhost mysql --no-prompt --no-stack --no-setup --dir "$GHOST_INSTALL"'; \
+	installCmd='su-exec node ghost install "$GHOST_VERSION" --db mysql --dbhost mysql --no-prompt --no-stack --no-setup --dir "$GHOST_INSTALL"'; \
 	# if ! eval "$installCmd"; then \
 	virtual='.build-deps-ghost'; \
 	apkDel="$apkDel $virtual"; \
@@ -96,9 +96,9 @@ VOLUME $GHOST_CONTENT
 
 RUN set -eux; \
 	npm install ghost-google-drive; \
-	mkdir ${GHOST_CONTENT}/storage; \
-	cp -vR node_modules/ghost-google-drive ${GHOST_CONTENT}/storage/ghost-google-drive; \
-	cd ${GHOST_CONTENT}/storage/ghost-google-drive; \
+	mkdir ${GHOST_CONTENT}/adapters/storage; \
+	cp -vR node_modules/ghost-google-drive ${GHOST_CONTENT}/adapters/storage/ghost-google-drive; \
+	cd ${GHOST_CONTENT}/adapters/storage/ghost-google-drive; \
 	npm install
 
 COPY docker-entrypoint.sh /usr/local/bin
