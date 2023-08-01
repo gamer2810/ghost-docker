@@ -96,6 +96,7 @@ VOLUME $GHOST_CONTENT
 
 RUN set -eux; \
 	npm install ghost-google-drive; \
+	mkdir -p ${GHOST_CONTENT}/adapters; \
 	mkdir ${GHOST_CONTENT}/adapters/storage; \
 	cp -vR node_modules/ghost-google-drive ${GHOST_CONTENT}/adapters/storage/ghost-google-drive; \
 	cd ${GHOST_CONTENT}/adapters/storage/ghost-google-drive; \
